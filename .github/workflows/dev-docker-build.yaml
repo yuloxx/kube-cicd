@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKERHUB_USERNAME: ${{ secrets.dockerhub.username }}
-      DOCKERHUB_TOKEN: ${{ secrets.dockerhub.token }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       IMAGE_NAME: comtantrisona2/backend
 
     steps:
@@ -34,7 +34,10 @@ jobs:
 
       # 登录到 Docker Hub 从secret读取
       - name: Log in to Docker Hub
-        run: echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        run: | 
+          echo "DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME"
+          echo "DOCKERHUB_TOKEN: $DOCKERHUB_TOKEN"
+          echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
       # 推送镜像到 Docker Hub
       - name: Push Docker image
