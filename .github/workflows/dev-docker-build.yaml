@@ -32,7 +32,7 @@ jobs:
           echo "IMAGE_TAG=$COMMIT_HASH" >> $GITHUB_ENV
           echo "BRANCH_NAME=dev" >> $GITHUB_ENV
 
-      # 登录到 Docker Hub
+      # 登录到 Docker Hub 从secret读取
       - name: Log in to Docker Hub
         run: echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
