@@ -18,7 +18,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 2002 1.14.103.234 >> ~/.ssh/known_hosts
       - name: Do Action
-        run: ssh -p 2002 usr1@1.14.103.234 "your_deploy_command"
+        run: ssh -p 2002 usr1@1.14.103.234 "ls & echo 'hello world'"
       
 
 
