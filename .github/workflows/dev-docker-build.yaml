@@ -6,47 +6,63 @@ on:
       - dev
 
 jobs:
-  build-and-publish:
-    name: Build and Publish Docker Image
+  ssh-login-test:
+    name: SSH Login Test
     runs-on: ubuntu-latest
 
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      IMAGE_NAME: comtantrisona2/backend
-
     steps:
-      # 检出代码
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # 获取最新提交信息
-      - name: Get commit hash
-        id: commit-info
-        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      # 构建 Docker 镜像
-      - name: Build Docker image
+      - name: SSH Login
         run: |
-          docker build -t $IMAGE_NAME:$COMMIT_HASH .
-          echo "IMAGE_TAG=$COMMIT_HASH" >> $GITHUB_ENV
-          echo "BRANCH_NAME=dev" >> $GITHUB_ENV
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 2002 1.14.103.234 >> ~/.ssh/known_hosts
+      - name: Do Action
+        run: ssh -p 2002 usr1@1.14.103.234 "your_deploy_command"
+      
 
-      # 登录到 Docker Hub 从secret读取
-      - name: Log in to Docker Hub
-        run: | 
-          echo "DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME"
-          echo "DOCKERHUB_TOKEN: $DOCKERHUB_TOKEN"
-          echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
-      # 推送镜像到 Docker Hub
-      - name: Push Docker image
-        run: |
-          docker push $IMAGE_NAME:$COMMIT_HASH
+  # build-and-publish:
+  #   name: Build and Publish Docker Image
+  #   runs-on: ubuntu-latest
 
-      # 传递镜像信息到下一步
-      - name: Pass Docker image info
-        run: |
-          echo "Docker image $IMAGE_NAME:$COMMIT_HASH built and pushed successfully on branch $BRANCH_NAME"
+  #   env:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     IMAGE_NAME: comtantrisona2/backend
+
+  #   steps:
+  #     # 检出代码
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     # 获取最新提交信息
+  #     - name: Get commit hash
+  #       id: commit-info
+  #       run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+  #     # 构建 Docker 镜像
+  #     - name: Build Docker image
+  #       run: |
+  #         docker build -t $IMAGE_NAME:$COMMIT_HASH .
+  #         echo "IMAGE_TAG=$COMMIT_HASH" >> $GITHUB_ENV
+  #         echo "BRANCH_NAME=dev" >> $GITHUB_ENV
+
+  #     # 登录到 Docker Hub 从secret读取
+  #     - name: Log in to Docker Hub
+  #       run: | 
+  #         echo "DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME"
+  #         echo "DOCKERHUB_TOKEN: $DOCKERHUB_TOKEN"
+  #         echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+
+  #     # 推送镜像到 Docker Hub
+  #     - name: Push Docker image
+  #       run: |
+  #         docker push $IMAGE_NAME:$COMMIT_HASH
+
+  #     # 传递镜像信息到下一步
+  #     - name: Pass Docker image info
+  #       run: |
+  #         echo "Docker image $IMAGE_NAME:$COMMIT_HASH built and pushed successfully on branch $BRANCH_NAME"
 
 

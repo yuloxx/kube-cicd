@@ -13,6 +13,8 @@ RUN go mod tidy
 # 构建 Go 应用程序
 RUN go build -o server .
 
+RUN ls -l /app
+
 # 第二阶段：运行阶段
 FROM alpine:latest
 
@@ -25,8 +27,11 @@ WORKDIR /app
 # 从构建阶段复制应用程序
 COPY --from=builder /app/server .
 
+RUN ls -l /app
+
 # 监听 8080 端口
 EXPOSE 8080
 
 # 运行应用程序
 CMD ["./server"]
+
